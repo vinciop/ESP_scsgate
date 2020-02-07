@@ -1,7 +1,7 @@
-"""A module designed to interact with SCSGate.
+"""A module designed to interact with ESP_SCSGate.
 
 See:
-https://github.com/flavio/scsgate
+https://github.com/vinciop/ESP_scsgate
 """
 
 # Always prefer setuptools over distutils
@@ -17,19 +17,19 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='scsgate',
+    name='ESP_scsgate',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.1.0',
 
-    description='A Python module to interact with SCSGate',
+    description='A Python module to interact with ESP_SCSGate',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/flavio/scsgate',
-    download_url='https://github.com/flavio/scsgate/archive/0.1.0.tar.gz',
+    url='https://github.com/vinciop/ESP_scsgate',
+    download_url='https://github.com/vinciop/ESP_scsgate/archive/0.1.0.tar.gz',
 
     # Author details
     author='Flavio Castelli',
@@ -61,7 +61,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='scsgate home-automation development',
+    keywords='ESP_scsgate home-automation development',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
