@@ -55,6 +55,8 @@ like the one created in the previous step.
 It's also possible to redirect all the output to a text file by using
 the ``-o`` flag.
 
+Connection port can be specified using the ``-p`` flag.
+
 License
 ~~~~~~~
 
