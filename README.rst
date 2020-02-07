@@ -2,7 +2,7 @@ scsgate |Build Status| |Docs|
 =============================
 
 This python module allows to interact with a
-`SCSGate <https://goo.gl/aKnpDw>`__ device.
+`ESP_SCSGate <https://translate.google.com/translate?hl=en&sl=it&tl=en&u=http%3A%2F%2Fguidopic.altervista.org%2Falter%2Fespscsgate.html&sandbox=1>`__ device.
 
 The module has been written to manage a SCSGate device with
 `home-assistant <https://home-assistant.io/>`__.
@@ -14,7 +14,7 @@ The scsgate module can be installed using pip:
 
 ::
 
-    sudo pip install scsgate
+    sudo pip install esp_scsgate
 
 Monitoring the SCS bus
 ----------------------
