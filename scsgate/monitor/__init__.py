@@ -76,7 +76,7 @@ class Monitor:
         if self._options.filter:
             self._load_filter(self._options.filter)
 
-        self._connection = Connection(device=options.device, logger=logging)
+        self._connection = Connection(device=options.device, logger=logging, port=options.port)
 
         self._setup_signal_handler()
 
@@ -100,12 +100,12 @@ class Monitor:
     def start(self):
         """ Monitor the bus for events and handle them """
         print("Entering monitoring mode, press CTRL-C to quit")
-        serial = self._connection.serial
+        socket = self._connection.socket
 
         while True:
-            serial.write(b"@R")
-            length = int(serial.read(), 16)
-            data = serial.read(length * 2)
+            socket.send(b"@R")
+            length = int(socket.receive(), 16)
+            data = socket.receive(length * 2)
             message = messages.parse(data)
             if not (self._options.filter and
                     message.entity and
