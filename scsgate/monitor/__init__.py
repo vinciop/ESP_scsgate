@@ -40,6 +40,13 @@ def cli_opts():
         dest="verbose",
         help="Verbose output",)
     parser.add_argument('device')
+    parser.add_argument(
+        "-p",
+        "--port",
+        type=str,
+        required=False,
+        dest="port",
+        help="port used for the connection",)
 
     return parser.parse_args()
 
@@ -76,7 +83,7 @@ class Monitor:
         if self._options.filter:
             self._load_filter(self._options.filter)
 
-        self._connection = Connection(device=options.device, logger=logging, port=options.port)
+        self._connection = Connection(device=options.device, logger=logging, port=self._options.port)
 
         self._setup_signal_handler()
 
