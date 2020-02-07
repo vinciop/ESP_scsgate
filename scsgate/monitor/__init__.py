@@ -43,7 +43,7 @@ def cli_opts():
     parser.add_argument(
         "-p",
         "--port",
-        type=str,
+        type=int,
         required=False,
         dest="port",
         help="port used for the connection",)
