@@ -83,7 +83,7 @@ class Monitor:
         if self._options.filter:
             self._load_filter(self._options.filter)
 
-        self._connection = Connection(device=options.device, logger=logging, port=self._options.port)
+        self._connection = Connection(device=options.device, logger=logging, port=options.port)
 
         self._setup_signal_handler()
 
@@ -97,56 +97,72 @@ class Monitor:
         """ Method called when handling signals """
         if self._options.config:
             with open(self._options.config, "w") as cfg:
-                yaml.dump(self._home_assistant_config(), cfg)
+                yaml.dump(self._home_assistant_config(self._options), cfg, sort_keys=False)
                 print(
                     "Dumped home assistant configuration at",
                     self._options.config)
-        self._connection.close()
+        self._connection.close
         sys.exit(0)
 
     def start(self):
         """ Monitor the bus for events and handle them """
         print("Entering monitoring mode, press CTRL-C to quit")
-        socket = self._connection.socket
+        socket = self._connection._socket
 
         while True:
-            socket.send(b"@R")
-            length = int(socket.receive(), 16)
-            data = socket.receive(length * 2)
-            message = messages.parse(data)
-            if not (self._options.filter and
-                    message.entity and
-                    message.entity in self._devices):
-                logging.debug(" ".join(message.bytes))
-            if not self._options.config or \
-               message.entity is None or \
-               message.entity in self._devices:
-                continue
+            self._connection.send(b"@R")
+            raw = self._connection.receive()
+            if not ((raw == b'k') or (raw is None)):
+                length = int(raw[:1], 16)
+                if length == 0:
+                    return
+                data = raw[1:]
+                message = data
+                if not self._options.config or \
+                    int(message.decode("utf-8")[2:4]) is None or \
+                    int(message.decode("utf-8")[2:4]) in self._devices or \
+                    message.decode("utf-8")[0:2] == '16':
+                    continue
 
-            print("New device found")
-            ha_id = input("Enter home assistant unique ID: ")
-            name = input("Enter name: ")
-            self._add_device(scs_id=message.entity, ha_id=ha_id, name=name)
+                print("New device found")
+                #print(message)
+                ha_id = message.decode("utf-8")[2:4]
+                name = input("Enter name: ")
+                type = input("Enter type(1=light, 2=cover, 3=switch): ")
+                self._add_device(scs_id=int(message.decode("utf-8")[2:4]), ha_id=ha_id, name=name, type=type)
 
-    def _add_device(self, scs_id, ha_id, name):
+    def _add_device(self, scs_id, ha_id, name, type):
         """ Add device to the list of known ones """
         if scs_id in self._devices:
             return
 
         self._devices[scs_id] = {
             'name': name,
-            'ha_id': ha_id
+            'ha_id': ha_id,
+            'type': type
         }
 
-    def _home_assistant_config(self):
+    def _home_assistant_config(self, options):
         """ Creates home assistant configuration for the known devices """
         devices = {}
+        light = {}
+        cover = {}
+        switch = {}
         for scs_id, dev in self._devices.items():
-            devices[dev['ha_id']] = {
-                'name': dev['name'],
-                'scs_id': scs_id}
+            if dev['type'] == '1':
+                light[dev['ha_id']] = {
+                    'name': dev['name'],
+                    'scs_id': scs_id}
+            if dev['type'] == '2':
+                cover[dev['ha_id']] = {
+                    'name': dev['name'],
+                    'scs_id': scs_id}
+            if dev['type'] == '3':
+                switch[dev['ha_id']] = {
+                    'name': dev['name'],
+                    'scs_id': scs_id}
 
-        return {'devices': devices}
+        return {'scsgate': {'device': options.device, 'port': options.port}, 'light':{'platform':'scsgate', 'devices': light}, 'cover':{'platform':'scsgate', 'devices': cover}, 'switch':{'platform':'scsgate', 'devices': switch}}
 
     def _load_filter(self, config):
         """ Load the filter file and populates self._devices accordingly """
